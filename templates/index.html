@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Report Analyser - AI Health Simplifier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://unpkg.com/tesseract.js@v4.1.1/dist/tesseract.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        'primary-dark': '#4A49B8'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="gradient-bg text-white py-6 px-4">
+            <div class="max-w-6xl mx-auto">
+                <h1 class="text-3xl md:text-4xl font-bold text-center mb-2">🏥 Medical Report Analyser</h1>
+                <p class="text-xl text-center opacity-90">AI-Powered Health Simplifier for Everyone</p>
+            </div>
+        </header>
+
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <!-- Upload Section -->
+            <div class="mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl card-shadow p-8">
+                    <h2 class="text-2xl font-semibold mb-6 text-center">📋 Upload Your Medical Report</h2>
+                    
+                    <div id="uploadArea" class="border-3 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center hover:border-primary transition-colors cursor-pointer">
+                        <div class="space-y-4">
+                            <div class="text-6xl">📄</div>
+                            <h3 class="text-xl font-medium">Drop your medical report here</h3>
+                            <p class="text-gray-600 dark:text-gray-400 text-lg">Or click to select a PDF or image file</p>
+                            <button class="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-xl text-lg font-medium transition-colors">
+                                Choose File
+                            </button>
+                        </div>
+                        <input type="file" id="fileInput" class="hidden" accept=".pdf,.jpg,.jpeg,.png">
+                    </div>
+                    
+                    <div id="fileInfo" class="hidden mt-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                        <p class="text-green-700 dark:text-green-300 text-lg font-medium">✅ File uploaded successfully!</p>
+                        <p id="fileName" class="text-gray-600 dark:text-gray-400"></p>
+                    </div>
+                    
+                    <div class="mt-6 text-center">
+                        <div class="flex gap-4 justify-center">
+                            <button id="analyzeBtn" class="bg-primary hover:bg-primary-dark text-white px-12 py-4 rounded-xl text-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                🔍 Analyze Report
+                            </button>
+                            <button id="viewReportBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-8 py-4 rounded-xl text-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                👁️ View Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Section -->
+            <div id="loadingSection" class="hidden mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl card-shadow p-8 text-center">
+                    <div class="pulse-animation text-6xl mb-4">🔄</div>
+                    <h3 class="text-2xl font-semibold mb-2">Analyzing Your Report...</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-lg">Our AI is reading and simplifying your medical information</p>
+                </div>
+            </div>
+
+            <!-- Analysis Results -->
+            <div id="resultsSection" class="hidden space-y-6">
+                <!-- Summary Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl card-shadow p-8">
+                    <h2 class="text-2xl font-semibold mb-6 flex items-center">
+                        📊 Simple Summary
+                    </h2>
+                    <div id="summaryContent" class="prose prose-lg max-w-none dark:prose-invert">
+                        <!-- Summary will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Key Findings -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl card-shadow p-8">
+                    <h2 class="text-2xl font-semibold mb-6 flex items-center">
+                        🔍 Key Findings Explained
+                    </h2>
+                    <div id="findingsContent" class="space-y-4">
+                        <!-- Findings will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Chatbot Section -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl card-shadow p-8">
+                    <h2 class="text-2xl font-semibold mb-6 flex items-center">
+                        💬 Ask Questions About Your Report
+                        <span id="memoryIndicator" class="ml-3 text-sm bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded-full hidden">
+                            🧠 Remembers conversation
+                        </span>
+                    </h2>
+                    
+                    <div id="chatMessages" class="space-y-4 mb-6 max-h-80 overflow-y-auto">
+                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                            <p class="text-blue-800 dark:text-blue-200 text-lg">👋 Hello! I'm here to help you understand your medical report. Feel free to ask me about any medical terms or values you don't understand.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <input type="text" id="chatInput" placeholder="Ask about your report... (e.g., What does TSH mean?)" 
+                               class="flex-1 px-4 py-3 text-lg border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <button id="sendBtn" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-xl text-lg font-medium transition-colors">
+                            Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Viewer Modal -->
+            <div id="reportModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+                    <div class="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-2xl font-semibold">📄 Medical Report Viewer</h3>
+                        <button id="closeModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl">
+                            ✕
+                        </button>
+                    </div>
+                    <div class="p-6 overflow-auto max-h-[calc(90vh-120px)]">
+                        <div id="reportContent" class="space-y-4">
+                            <!-- Report content will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html> 

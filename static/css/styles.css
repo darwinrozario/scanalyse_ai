@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Base Styles */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Gradient Background */
+.gradient-bg {
+    background: linear-gradient(135deg, #5D5CDE 0%, #7C7CE8 100%);
+}
+
+/* Card Shadows */
+.card-shadow {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.dark .card-shadow {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Animations */
+.pulse-animation {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.typing-animation::after {
+    content: '|';
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Medical Term Styling */
+.medical-term {
+    background: linear-gradient(90deg, #E0E7FF 0%, #C7D2FE 100%);
+    border-left: 4px solid #5D5CDE;
+}
+
+.dark .medical-term {
+    background: linear-gradient(90deg, #312E81 0%, #3730A3 100%);
+    border-left: 4px solid #7C7CE8;
+}
+
+/* Enhanced Bold Text Styling for Elderly Users */
+strong {
+    font-weight: 700 !important;
+    color: #1F2937 !important;
+    background: linear-gradient(90deg, #FEF3C7 0%, #FDE68A 100%);
+    padding: 2px 4px;
+    border-radius: 4px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.dark strong {
+    color: #F9FAFB !important;
+    background: linear-gradient(90deg, #92400E 0%, #B45309 100%);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Medical values and numbers */
+.medical-term strong {
+    background: linear-gradient(90deg, #DBEAFE 0%, #BFDBFE 100%);
+    color: #1E40AF !important;
+    font-size: 1.05em;
+}
+
+.dark .medical-term strong {
+    background: linear-gradient(90deg, #1E3A8A 0%, #1E40AF 100%);
+    color: #EFF6FF !important;
+}
+
+/* Status indicators with enhanced visibility */
+.status-normal strong {
+    background: linear-gradient(90deg, #D1FAE5 0%, #A7F3D0 100%);
+    color: #065F46 !important;
+}
+
+.status-abnormal strong {
+    background: linear-gradient(90deg, #FEE2E2 0%, #FECACA 100%);
+    color: #991B1B !important;
+}
+
+.status-borderline strong {
+    background: linear-gradient(90deg, #FEF3C7 0%, #FDE68A 100%);
+    color: #92400E !important;
+}
+
+/* Modal Styling */
+#reportModal {
+    backdrop-filter: blur(4px);
+}
+
+#reportModal > div {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* PDF and Image Display */
+#reportContent img {
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+#reportContent canvas {
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Button hover effects */
+#viewReportBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+#viewReportBtn:disabled {
+    transform: none;
+    box-shadow: none;
+} 
